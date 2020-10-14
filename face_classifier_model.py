@@ -42,13 +42,13 @@ def inference(image, model):
 
 
 if __name__ == '__main__':
-    image_path = "/home/ambolt/Data/emily/MAFA_faces/train/images/test_00000003.jpg"
-    image = Image.open(image_path)
+    # image_path = "/home/ambolt/Data/emily/MAFA_faces/train/images/test_00000003.jpg"
+    # image = Image.open(image_path)
 
-    model = torch.load("/home/ambolt/Ambolt/emily/emily-face-detector/models/google_LeNet_epoch_10.pth")
+    model = torch.load("/home/simon/projects/emily-face-mask-detection/models/google_LeNet_epoch_10.pth")
 
-    pred = inference(image, model)
-
-    print(pred)
+    # pred = inference(image, model)
+    #
+    # print(pred)
 
 
