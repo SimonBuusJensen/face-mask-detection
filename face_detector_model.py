@@ -17,8 +17,24 @@ def resize(image):
     return image
 
 
+# def eyes_2_face(eyes):
+#
+#     eye_1, eye_2 = eyes[:2]
+#     (x_eye_1, y_eye_1, w_eye_1, h_eye_1) = eye_1
+#     (x_eye_2, y_eye_2, w_eye_2, h_eye_2) = eye_2
+#
+#     if x_eye_1
+#
+#
+#     x1_face = x_eye_1
+#     x2_face =
+    
+    
+    
+
+
 # Load the cascade
-face_cascade = cv2.CascadeClassifier(cv2.data.haarcascades + 'haarcascade_frontalface_default.xml')
+face_cascade = cv2.CascadeClassifier(cv2.data.haarcascades + 'haarcascade_eye.xml')
 
 # Read a random input image
 images = glob.glob1("examples", "*.jpg")
