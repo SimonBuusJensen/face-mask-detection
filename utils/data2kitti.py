@@ -1,5 +1,7 @@
 # from data_utils.widerface2kitti import widerFace2kitti
-from data_utils.mafa2kitti import mafa2kitti
+from utils.mafa2kitti import mafa2kitti
+from utils.fddb2kitti import fddb2kitti
+from utils.widerface2kitti import widerFace2kitti
 # from data_utils.fddb2kitti import fddb2kitti
 # from data_utils.kaggle2kitti import kaggle2kitti
 # from data_utils.argparser_data2kitti import argparser_data2kitti
@@ -21,10 +23,8 @@ def main():
     # # Store Converted annotations in KITTI format
     # kitti_base_dir = args.kitti_base_path
     # category_limit = [args.category_limit, args.category_limit]  # Mask / No-Mask Limits
-    # kitti_resize_dims = (args.tlt_input_dims_width, args.tlt_input_dims_height)  # Default for DetectNet-v2 : Look at TLT model requirements
+    # kitti_resize_dims = (args.tlt_input_dims_width, args.tlt_input_dims_height)  # Default for DetectNet-v2 : Look at TLT model requirement
 
-    total_masks, total_no_masks = 0, 0
-    count_masks, count_no_masks = 0, 0
     # To check if labels are converted in right format
     # if args.check_labels:
     #     # Check from train directory
@@ -43,59 +43,68 @@ def main():
     # ----------------------------------------
     # MAFA Dataset Conversion
     # ----------------------------------------
-    # if args.train:
+    total_masks, total_no_masks = 0, 0
+    is_train = True
+    mafa_base_dir = "/home/ambolt/Data/emily/MAFA Dataset"
 
-    mafa_base_dir = "/home/simon/Datasets/face-mask-detection-data/MAFA Dataset"
-    kitti_base_dir = "/home/simon/Datasets/face-mask-detection-data/MAFA Dataset/kitti/"
+    if is_train:
+        annotation_file = os.path.join(mafa_base_dir, 'MAFA-Label-Train/LabelTrainAll.mat')
+        mafa_base_dir = os.path.join(mafa_base_dir, 'train-images/images')
+    else:
+        annotation_file = os.path.join(mafa_base_dir, 'MAFA-Label-Test/LabelTestAll.mat')
+        mafa_base_dir = os.path.join(mafa_base_dir, 'test-images/images')
 
-    # annotation_file = os.path.join(mafa_base_dir, 'MAFA-Label-Train/LabelTrainAll.mat')
-    # mafa_base_dir = os.path.join(mafa_base_dir, 'train-images/images')
-    # if args.val:
-    annotation_file = os.path.join(mafa_base_dir, 'MAFA-Label-Test/LabelTestAll.mat')
-    mafa_base_dir = os.path.join(mafa_base_dir, 'test-images/images')
 
-    category_limit_mod = [6000 - total_masks, 6000 - total_no_masks]
+    fddb_base_dir = "/home/ambolt/Data/emily/FDDB Dataset"
+    widerface_base_dir = "/home/ambolt/Data/emily/Wider Face Dataset"
+    kitti_base_dir = "/home/ambolt/Data/emily/faces_kitti Dataset/"
+
+    category_limit_mod = [3000, 3000]
 
     kitti_label = mafa2kitti(annotation_file=annotation_file, mafa_base_dir=mafa_base_dir,
-                             kitti_base_dir=kitti_base_dir, kitti_resize_dims=(480, 272),
-                             category_limit=category_limit_mod, train=False)
+                             kitti_base_dir=kitti_base_dir, kitti_resize_dims=(960, 544),
+                             category_limit=category_limit_mod, train=is_train)
     count_masks, count_no_masks = kitti_label.mat2data()
     total_masks += count_masks
     total_no_masks += count_no_masks
+    print("MAFA data count Mask Labelled:{} and No-Mask Labelled:{}".format(count_masks, count_no_masks))
+    #
+
+
     # ----------------------------------------
     # FDDB Dataset Conversion
     # ----------------------------------------
-    # if args.train:
-    #     # Modifying category limit based on FDDB
-    #     total_masks += count_masks
-    #     total_no_masks += count_no_masks
-    #     print("Total Mask Labelled:{} and No-Mask Labelled:{}".format(total_masks, total_no_masks))
-    #     category_limit_mod = [category_limit[0]-total_masks, category_limit[1]-total_no_masks]
-    #     annotation_path = os.path.join(fddb_base_dir, 'FDDB-folds') #r'C:\Users\ameykulkarni\Downloads\FDDB-folds\FDDB-folds'
-    #     kitti_label = fddb2kitti(annotation_path=annotation_path, fddb_base_dir=fddb_base_dir,
-    #                              kitti_base_dir=kitti_base_dir, kitti_resize_dims=kitti_resize_dims,
-    #                              category_limit=category_limit_mod)
-    #     count_masks, count_no_masks = kitti_label.fddb_data()
+
+
+    annotation_path = os.path.join(fddb_base_dir, 'FDDB-folds') #r'C:\Users\ameykulkarni\Downloads\FDDB-folds\FDDB-folds'
+    kitti_label = fddb2kitti(annotation_path=annotation_path, fddb_base_dir=fddb_base_dir,
+                             kitti_base_dir=kitti_base_dir, kitti_resize_dims=(660, 544),
+                             category_limit=category_limit_mod)
+    count_masks, count_no_masks = kitti_label.fddb_data()
+    total_masks += count_masks
+    total_no_masks += count_no_masks
+    print("fddb_data: Count Mask Labelled:{} and No-Mask Labelled:{}".format(total_masks, total_no_masks))
+
 
     # ----------------------------------------
     # Wider-Face Dataset Conversion
     # ----------------------------------------
-    # total_masks += count_masks
-    # total_no_masks += count_no_masks
-    # print("Total Mask Labelled:{} and No-Mask Labelled:{}".format(total_masks, total_no_masks))
-    # category_limit_mod = [category_limit[0] - total_masks, category_limit[1] - total_no_masks]
-    #
-    # if args.train:
+
+    # if is_train:
     #     annotation_file = os.path.join(widerface_base_dir, 'wider_face_split/wider_face_train.mat')
     #     widerFace_base_dir = os.path.join(widerface_base_dir, 'WIDER_train/images')
-    # if args.val:
+    # else:
     #     # Modify this
     #     annotation_file = os.path.join(widerface_base_dir, 'wider_face_split/wider_face_val.mat')
     #     widerFace_base_dir = os.path.join(widerface_base_dir, 'WIDER_val/images')
     #
     # kitti_label = widerFace2kitti(annotation_file=annotation_file, widerFace_base_dir=widerFace_base_dir,
-    #                               kitti_base_dir=kitti_base_dir, kitti_resize_dims=kitti_resize_dims,
-    #                               category_limit=category_limit_mod, train=args.train)
+    #                               kitti_base_dir=kitti_base_dir, kitti_resize_dims=(480, 272),
+    #                               category_limit=category_limit_mod, train=is_train)
+    # count_masks, count_no_masks = kitti_label.mat2data()
+    # total_masks += count_masks
+    # total_no_masks += count_no_masks
+
 
     print("----------------------------")
     print("Final: Total Mask Labelled:{}\nTotal No-Mask Labelled:{}".format(total_masks, total_no_masks))
