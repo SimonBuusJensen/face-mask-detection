@@ -16,23 +16,6 @@ def resize(image):
     image = cv2.resize(image, dsize=(int(image.shape[1] * scale), int(image.shape[0] * scale)))
     return image
 
-
-# def eyes_2_face(eyes):
-#
-#     eye_1, eye_2 = eyes[:2]
-#     (x_eye_1, y_eye_1, w_eye_1, h_eye_1) = eye_1
-#     (x_eye_2, y_eye_2, w_eye_2, h_eye_2) = eye_2
-#
-#     if x_eye_1
-#
-#
-#     x1_face = x_eye_1
-#     x2_face =
-    
-    
-    
-
-
 # Load the cascade
 face_cascade = cv2.CascadeClassifier(cv2.data.haarcascades + 'haarcascade_eye.xml')
 
@@ -54,6 +37,3 @@ faces = face_cascade.detectMultiScale(gray, 1.1, 5)
 for (x, y, w, h) in faces:
     cv2.rectangle(img, (x, y), (x + w, y + h), (255, 0, 0), 2)
 
-# Display the output
-# cv2.imshow('img', img)
-# cv2.waitKey()

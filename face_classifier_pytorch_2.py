@@ -124,12 +124,12 @@ def test(model, device, criterion, test_loader):
 
 def main():
     # Training settings
-    parser = argparse.ArgumentParser(description='PyTorch MNIST Example')
-    parser.add_argument('--batch-size', type=int, default=32, metavar='N',
+    parser = argparse.ArgumentParser(description='PyTorch Mask Classifier Example')
+    parser.add_argument('--batch-size', type=int, default=16, metavar='N',
                         help='input batch size for training (default: 64)')
-    parser.add_argument('--test-batch-size', type=int, default=32, metavar='N',
+    parser.add_argument('--test-batch-size', type=int, default=16, metavar='N',
                         help='input batch size for testing (default: 1000)')
-    parser.add_argument('--epochs', type=int, default=14, metavar='N',
+    parser.add_argument('--epochs', type=int, default=20, metavar='N',
                         help='number of epochs to train (default: 14)')
     parser.add_argument('--lr', type=float, default=0.05, metavar='LR',
                         help='learning rate (default: 1.0)')
@@ -161,11 +161,6 @@ def main():
         train_kwargs.update(cuda_kwargs)
         test_kwargs.update(cuda_kwargs)
 
-    # transform=transforms.Compose([
-    #     transforms.ToTensor(),
-    #     transforms.Normalize((0.1307,), (0.3081,))
-    #     ])
-
     transforms_fn = transforms.Compose([transforms.Resize((128, 128)),
                                         transforms.ToTensor()])
 
@@ -179,12 +174,10 @@ def main():
     test_samples = int(round(len(dataset) * 0.2, 0))
     train_set, test_set = torch.utils.data.random_split(dataset, [train_samples, test_samples])
 
-
     train_loader = torch.utils.data.DataLoader(train_set, **train_kwargs)
     test_loader = torch.utils.data.DataLoader(test_set, **test_kwargs)
 
     model = Net().to(device)
-    # optimizer = optim.Adam(model.parameters(), lr=args.lr)
 
     criterion = nn.CrossEntropyLoss()
     optimizer = optim.SGD(model.parameters(), lr=args.lr, momentum=0.9)
@@ -196,7 +189,7 @@ def main():
         scheduler.step()
 
         if args.save_model:
-            torch.save(model, f"./models/custom{str(epoch + 1)}.pth")
+            torch.save(model, f"./models/custom_epoch_{str(epoch + 1)}.pth")
 
 
 if __name__ == '__main__':

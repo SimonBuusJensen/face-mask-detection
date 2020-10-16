@@ -1,0 +1,20 @@
+
+{
+  "name": "test-emily-api on Emily",
+  "dockerComposeFile": ["/home/ambolt/Projects/test-emily-api/docker-compose.yml", "/home/ambolt/Projects/test-emily-api/.devcontainer/docker-compose.yml"],
+  "service": "test-emily-api",
+  "workspaceFolder": "/workspace",
+  "shutdownAction": "stopCompose",
+  "extensions": ["ms-python.python", "ms-azuretools.vscode-docker", "hnw.vscode-auto-open-markdown-preview"],
+  "forwardPorts": [4242],
+  "runServices": [],
+  "remoteEnv": {},
+  "mounts": [],
+  "settings": {
+    "terminal.integrated.shell.linux": null
+  },
+  "postCreateCommand": [
+    "pip install flask-cors"
+  ]
+}
+
