@@ -123,17 +123,3 @@ class fddb2kitti():
                     _count_no_mask+=1
         return _count_mask, _count_no_mask
 
-def main():
-    fddb_base_dir = '/home/nvidia/face-mask-detection/datasets/fddb'
-    annotation_path = '/home/nvidia/face-mask-detection/datasets/fddb/FDDB-folds'
-    kitti_base_dir = '/home/nvidia/face-mask-detection/datasets/KITTI_1024'
-
-    category_limit = [1000, 1000] # Mask / No-Mask Limits
-    kitti_resize_dims = (960, 544) # Look at TLT model requirements
-    kitti_label = fddb2kitti(annotation_path=annotation_path, fddb_base_dir=fddb_base_dir,
-                             kitti_base_dir=kitti_base_dir, kitti_resize_dims=kitti_resize_dims,
-                             category_limit=category_limit)
-    count_masks, count_no_masks = kitti_label.fddb_data()
-
-if __name__ == '__main__':
-    main()

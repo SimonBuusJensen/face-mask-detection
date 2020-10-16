@@ -3,7 +3,7 @@ import os
 import cv2
 from utils.utility import create_csv_writer
 
-kitti_path = "/home/ambolt/Data/emily/faces_kitti Dataset"
+
 
 
 def open_label_file(sample_name):
@@ -125,7 +125,6 @@ def extract_labels(out_dir=None):
         sample = get_sample(sample_name)
         if sample:
             _, _, class_name = sample
-            # print(sample_name, class_name)
             out_dict = {
                 "file_name": sample_name + ".jpg",
                 "class": class_name
@@ -133,20 +132,14 @@ def extract_labels(out_dir=None):
             file_writer.writerow(out_dict)
 
 
-if __name__ == '__main__':
-    extract_labels("/home/ambolt/Data/emily/faces")
+def main():
+
+    kitti_data = "/home/ambolt/Data/emily/faces_kitti Dataset"
+    output_dir = "/home/ambolt/Data/emily/faces"
+
+    extract_labels()
     extract_face_images("/home/ambolt/Data/emily/faces/images_big", 50)
 
-    # for sample_name in get_sample_names():
-    #     print(sample_name)
-    #     sample = get_sample(sample_name)
-    #     if sample:
-    #         img, bbox, class_name = sample
-    #         x1, y1, x2, y2 = bbox
-    #         face_img = img[y1:y2, x1:x2]
-    #         cv2.rectangle(img, pt1=(x1, y1), pt2=(x2, y2), color=(255, 0, 0), thickness=2)
-    #
-    #         window_name = sample_name + " " + class_name
-            # cv2.imshow(window_name, face_img)
-            # cv2.waitKey(0)
-            # cv2.destroyWindow(window_name)
+
+if __name__ == '__main__':
+    main()
