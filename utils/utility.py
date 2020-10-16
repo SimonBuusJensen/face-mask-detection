@@ -1,3 +1,4 @@
+import os
 import csv
 
 
@@ -10,3 +11,13 @@ def create_csv_writer(csv_file, column_names, sep=",", write_header=True):
     if write_header:
         writer.writeheader()
     return writer
+
+
+def create_kitti_csv_writer(out_dir):
+    fname = "labels.csv"
+    out_fp = os.path.join(out_dir, fname)
+    columns = ["file_name", "class"]
+
+    file = open(out_fp, "w")
+    file_writer = create_csv_writer(file, columns, sep=",", write_header=True)
+    return file_writer

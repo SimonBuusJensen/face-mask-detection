@@ -32,7 +32,7 @@ def main():
     fddb_base_dir = "/home/ambolt/Data/emily/FDDB Dataset"
 
     # Specify where the converted images and labels will be stored
-    output_dir = "/home/ambolt/Data/emily/faces_kitti Dataset/"
+    output_dir = "/home/ambolt/Data/emily/faces_kitti Dataset/data_new"
     category_limit_mod = [3200, 3200]
 
     total_masks, total_no_masks = 0, 0
@@ -52,7 +52,6 @@ def main():
     count_masks, count_no_masks = kitti_label.mat2data()
     total_masks += count_masks
     total_no_masks += count_no_masks
-    print("MAFA data: count Mask Labelled:{} and No-Mask Labelled:{}".format(count_masks, count_no_masks))
 
     # ----------------------------------------
     # FDDB Dataset Conversion
@@ -68,7 +67,6 @@ def main():
     count_masks, count_no_masks = kitti_label.fddb_data()
     total_masks += count_masks
     total_no_masks += count_no_masks
-    print("fddb_data: Count Mask Labelled:{} and No-Mask Labelled:{}".format(total_masks, total_no_masks))
 
     print("----------------------------")
     print("Final: Total Mask Labelled:{}\nTotal No-Mask Labelled:{}".format(total_masks, total_no_masks))

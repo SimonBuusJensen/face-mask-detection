@@ -1,43 +1,133 @@
 import glob
 import os
 import cv2
-from utils.utility import create_csv_writer
+
+from utils.utility import create_csv_writer, create_kitti_csv_writer
 
 
+def main():
+    # Path to the kitti formated data
+    kitti_data = "/home/ambolt/Data/emily/faces_kitti Dataset/data"
+    extra_px_around_face_pct = 25
+
+    # Specify where the converted face images and labels should be stored
+    output_dir = "/home/ambolt/Data/emily/faces2"
+
+    try:
+        os.makedirs(output_dir)
+    except FileExistsError:
+        print("Directory Already Exists")
+
+    try:
+        os.makedirs(os.path.join(output_dir, "images"))
+    except FileExistsError:
+        print("Directory Already Exists")
+
+    # ----------------------------------------
+    # Extract faces and labels from KITTI image Dataset
+    # ----------------------------------------
+    kitti2face(kitti_data_dir=kitti_data,
+               out_dir=output_dir,
+               extra_px_around_face_pct=extra_px_around_face_pct)
 
 
-def open_label_file(sample_name):
-    label_name = sample_name + ".txt"
-    fp = os.path.join(kitti_path, "data", "labels", label_name)
-    label_file = open(fp, "r")
-    return label_file
+def kitti2face(kitti_data_dir, out_dir, extra_px_around_face_pct):
+
+    annotation_files_dir = os.path.join(kitti_data_dir, 'labels')
+    image_files_dir = os.path.join(kitti_data_dir, 'images')
+    file_writer = create_kitti_csv_writer(out_dir)
+
+    n_samples = len(get_sample_names(kitti_data_dir))
+    for sample_i, sample_name in enumerate(get_sample_names(kitti_data_dir)):
+        img_path = os.path.join(image_files_dir, sample_name + ".jpg")
+        img = get_image(img_path)
+
+        if img is None:
+            continue
+
+        label_path = os.path.join(annotation_files_dir, sample_name + ".txt")
+        label = get_label(label_path)
+
+        class_name, x1, y1, x2, y2 = label_to_line(label)
+        bbox = (x1, y1, x2, y2)
+        bbox = increase_bbox_size(bbox, extra_px_around_face_pct)
+        bbox = check_bbox_dims(img, bbox)
+        if bbox is None:
+            continue
+
+        face = extract_face(img, bbox)
+
+        # Save the face image
+        new_image_path = os.path.join(out_dir, "images", sample_name + ".jpg")
+        cv2.imwrite(new_image_path, face)
+
+        # Write to csv-file
+        out_dict = {
+            "file_name": sample_name + ".jpg",
+            "class": class_name
+        }
+        file_writer.writerow(out_dict)
+
+        if (sample_i + 1) % 100 == 0:
+            print("Converted images and labels (" + str(sample_i + 1) + "/" + str(n_samples) + ")")
 
 
-def open_img_file(sample_name):
-    img_name = sample_name + ".jpg"
-    fp = os.path.join(kitti_path, "data", "images", img_name)
+def get_sample_names(kitti_data_dir):
+    img_names = glob.glob1(os.path.join(kitti_data_dir, "images"), "*.jpg")
+    sample_names = [x.rstrip(".jpg") for x in img_names]
+    return sample_names
+
+
+def get_image(sample_img_path):
+    fp = sample_img_path
     img = cv2.imread(fp)
     return img
 
 
-def increase_bbox_size(bbox, px=20):
+def get_label(sample_label_path):
+    fp = sample_label_path
+    label_file = open(fp, "r")
+    lines = label_file.readlines()
+    return lines[0]
+
+
+def label_to_line(label):
+    line_splits = label.split(" ")
+
+    class_name = line_splits[0]
+
+    x1 = line_splits[4]
+    y1 = line_splits[5]
+    x2 = line_splits[6]
+    y2 = line_splits[7]
+    x1, y1, x2, y2 = map(int, [x1, y1, x2, y2])
+
+    return class_name, x1, y1, x2, y2
+
+
+def increase_bbox_size(bbox, pct_increase=0):
+
     x1, y1, x2, y2 = bbox
-    half_px = int(px / 2)
-    x1 = x1 - half_px
-    y1 = y1 - half_px
-    x2 = x2 + half_px
-    y2 = y2 + half_px
+
+    assert pct_increase >= 0 and pct_increase <= 100, \
+        f"pct_increase should be greater than or equal 0 and lesser than or equal 100"
+
+    width = abs(x2 - x1)
+    height = abs(y2 - y1)
+
+    if pct_increase > 0:
+        pct_increase = (pct_increase + 100) / 100
+        extra_width = int((width * pct_increase - width) / 2)
+        extra_heigth = int((height * pct_increase - height) / 2)
+        x1 = x1 - extra_width
+        y1 = y1 - extra_heigth
+        x2 = x2 + extra_width
+        y2 = y2 + extra_heigth
+
     return (x1, y1, x2, y2)
 
 
-def get_sample(sample_name, enlarge_bbox_by=0):
-    img = open_img_file(sample_name)
-
-    bbox = get_bounding_boxes(sample_name)
-
-    if enlarge_bbox_by > 0:
-        bbox = increase_bbox_size(bbox, enlarge_bbox_by)
-
+def check_bbox_dims(img, bbox):
     x1, y1, x2, y2 = bbox
     if x1 < 0:
         x1 = 0
@@ -52,93 +142,13 @@ def get_sample(sample_name, enlarge_bbox_by=0):
     if y1 > y2:
         return None
 
-    class_name = get_class(sample_name)
-    return img, (x1, y1, x2, y2), class_name
+    return (x1, y1, x2, y2)
 
 
-def read_label(sample_name):
-    label_file = open_label_file(sample_name)
-    lines = label_file.readlines()
-    # assert len(lines) == 1
-    return lines[0]
-
-
-def get_class(sample_name):
-    line = read_label(sample_name)
-    line_splits = line.split(" ")
-    class_name = line_splits[0]
-    return class_name
-
-
-def get_bounding_boxes(sample_name):
-    line = read_label(sample_name)
-    line_splits = line.split(" ")
-    x1 = line_splits[4]
-    y1 = line_splits[5]
-    x2 = line_splits[6]
-    y2 = line_splits[7]
-    x1, y1, x2, y2 = map(int, [x1, y1, x2, y2])
-    return x1, y1, x2, y2
-
-
-def get_sample_names():
-    img_names = glob.glob1(os.path.join(kitti_path, "data", "images"), "*.jpg")
-    sample_names = [x.rstrip(".jpg") for x in img_names]
-    return sample_names
-
-
-def extract_face_images(out_dir=None, enlarge_bbox_by=0):
-    for sample_name in get_sample_names():
-        # print(sample_name)
-        sample = get_sample(sample_name, enlarge_bbox_by)
-        if sample:
-            img, bbox, class_name = sample
-            x1, y1, x2, y2 = bbox
-            face_img = img[y1:y2, x1:x2]
-            try:
-                cv2.imwrite(os.path.join(out_dir, sample_name + ".jpg"), face_img)
-            except cv2.error as e:
-                print(sample_name, e)
-
-
-def get_csv_writer(out_dir):
-    fname = "labels.csv"
-    out_fp = os.path.join(out_dir, fname)
-    columns = ["file_name", "class"]
-
-    # If the csv-file exists we append to it
-    if os.path.exists(out_fp):
-        file = open(out_fp, "a+")
-        file_writer = create_csv_writer(file, columns, sep=",", write_header=False)
-    # If the csv-file does NOT exists we write to it and create a header row
-    else:
-        file = open(out_fp, "w")
-        file_writer = create_csv_writer(file, columns, sep=",", write_header=True)
-    return file_writer
-
-
-def extract_labels(out_dir=None):
-    file_writer = get_csv_writer(out_dir)
-
-    for sample_name in get_sample_names():
-
-        sample = get_sample(sample_name)
-        if sample:
-            _, _, class_name = sample
-            out_dict = {
-                "file_name": sample_name + ".jpg",
-                "class": class_name
-            }
-            file_writer.writerow(out_dict)
-
-
-def main():
-
-    kitti_data = "/home/ambolt/Data/emily/faces_kitti Dataset"
-    output_dir = "/home/ambolt/Data/emily/faces"
-
-    extract_labels()
-    extract_face_images("/home/ambolt/Data/emily/faces/images_big", 50)
+def extract_face(img, face_bbox):
+    x1, y1, x2, y2 = face_bbox
+    face_img = img[y1:y2, x1:x2]
+    return face_img
 
 
 if __name__ == '__main__':

@@ -14,15 +14,15 @@ class fddb2kitti():
         self.count_no_mask = category_limit[1]
         self.kitti_resize_dims = kitti_resize_dims
         try:
-            os.makedirs(self.kitti_base_dir+'/train/images',mode=0o777)
+            os.makedirs(self.kitti_base_dir+'/images',mode=0o777)
         except FileExistsError:
             print("Directory Already Exists")
-        self.kitti_images = os.path.join(self.kitti_base_dir, 'train/images')
+        self.kitti_images = os.path.join(self.kitti_base_dir, 'images')
         try:
-            os.makedirs(self.kitti_base_dir+ '/train/labels',mode=0o777)
+            os.makedirs(self.kitti_base_dir+ '/labels',mode=0o777)
         except FileExistsError:
             print("Directory Already Exists")
-        self.kitti_labels = os.path.join(self.kitti_base_dir, 'train/labels')
+        self.kitti_labels = os.path.join(self.kitti_base_dir, 'labels')
 
     def ellipese2bbox(self, face_annotations):
         major_axis_radius = int(float(face_annotations[0]))
