@@ -1,8 +1,7 @@
 import numpy as np
 import cv2
-from face_detector_model import face_cascade, detect_face
+from FaceDetector import face_cascade, detect_face
 from face_classifier_model import inference
-from face_classifier_pytorch_2 import Net
 import torch
 from PIL import Image
 
