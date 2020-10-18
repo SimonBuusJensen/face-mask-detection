@@ -3,41 +3,42 @@ import cv2
 
 class FaceDetector:
 
-    def __init__(self, model_name='haarcascade_eye.xml', scale_factor=1.1, min_neighbors=8):
+    def __init__(self):
 
         # Initialize OpenCV's cascading classifier
-        self.eye_cascade_classifier = cv2.CascadeClassifier(cv2.data.haarcascades + model_name)
+        self.eye_cascade_classifier = cv2.CascadeClassifier(cv2.data.haarcascades + 'haarcascade_eye.xml')
 
-        # Parameters for the detectMultiScale method which is used for detects the eyes (see detect_eyes)
-        self.scale_factor = scale_factor
-        self.min_neighbors = min_neighbors
+        # Parameters for the detectMultiScale method which detects the eyes
+        self.scale_factor = 1.1
+        self.min_neighbors = 8
 
-    def detect_face(self, image):
+    def detect_face(self, img):
         """
         Detects a single face in the image based on detected eyes.
         Input: img (dtype: uint8).
         Attention: The detect_face only works for a single person in the image an the persons's eyes has to be visible
         """
-        eyes = self.detect_eyes(image)
+        eyes = self.detect_eyes(img)
 
         if eyes is not None:
             # Convert eyes to face
             right_eye, left_eye = eyes
-            img_h, img_w = image.shape[:2]
+            img_h, img_w = img.shape[:2]
             face = self._eyes_2_face(right_eye, left_eye, img_h, img_w)
-            return face, eyes
+            return face
         else:
             return None
 
-    def detect_eyes(self, image):
+    def detect_eyes(self, img):
         """
         Detects the eyes of a person using OpenCV's CascadeClassifier
         Input: img (dtype: uint8).
         Attention: The detect_face only works for a single person in the image an the persons's eyes has to be visible
         """
+
         # Resize the input image and convert to gray scale
-        image = self._resize(image, 256)
-        gray = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
+        img = self._resize(img, 256)
+        gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
 
         # Detect eyes
         eyes = self.eye_cascade_classifier.detectMultiScale(gray, self.scale_factor, self.min_neighbors)
@@ -101,7 +102,7 @@ class FaceDetector:
 
 if __name__ == '__main__':
 
-    face_detector = FaceDetector()
-    img = cv2.imread("/home/simon/Ambolt/emily/emily-face-mask-detection/examples/train_00000008.jpg")
-    face = face_detector.detect_face(img)
+    FaceDetector
 
+    img = cv2.imread("/home/simon/Ambolt/emily/emily-face-mask-detection/examples/train_00000008.jpg")
+    face, eyes = detect_face(img)
