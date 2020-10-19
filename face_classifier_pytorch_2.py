@@ -27,6 +27,8 @@ class FaceMaskDataset(torch.utils.data.Dataset):
         img_path = os.path.join(self.root_dir, self.annotations.iloc[index, 0])
         # image = cv2.imread(img_path)
         image = Image.open(img_path)
+        image = image.convert(mode="L")
+
         y_label = torch.tensor(int(0 if self.annotations.iloc[index, 1] == "No-Mask" else 1))
 
         if self.transform:
@@ -38,7 +40,7 @@ class FaceMaskDataset(torch.utils.data.Dataset):
 class Net(nn.Module):
     def __init__(self):
         super(Net, self).__init__()
-        self.conv1 = nn.Conv2d(3, 32, 3, 1)
+        self.conv1 = nn.Conv2d(1, 32, 3, 1)
         self.conv2 = nn.Conv2d(32, 64, 3, 1)
         self.conv3 = nn.Conv2d(64, 128, 3, 1)
         self.conv4 = nn.Conv2d(128, 128, 3, 1)
@@ -189,7 +191,7 @@ def main():
         scheduler.step()
 
         if args.save_model:
-            torch.save(model, f"./models/2020-10-19_custom_epoch_{str(epoch + 1)}.pth")
+            torch.save(model, f"./models/2020-10-19_custom_gray_epoch_{str(epoch + 1)}.pth")
 
 
 if __name__ == '__main__':
