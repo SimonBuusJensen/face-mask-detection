@@ -11,6 +11,7 @@ import pandas as pd
 import cv2
 from PIL import Image
 import os
+from face_classifier_model import Net
 
 
 class FaceMaskDataset(torch.utils.data.Dataset):
@@ -35,9 +36,6 @@ class FaceMaskDataset(torch.utils.data.Dataset):
             image = self.transform(image)
 
         return (image, y_label)
-
-
-
 
 
 def train(args, model, device, train_loader, optimizer, criterion, epoch):

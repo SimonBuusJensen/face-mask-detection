@@ -9,8 +9,10 @@ from PIL import Image
 font = cv2.FONT_HERSHEY_SIMPLEX
 
 class MaxSizeList(list):
+
     def __init__(self, maxlen):
         self._maxlen = maxlen
+        self.append(0)
 
     def append(self, element):
         self.__delitem__(slice(0, len(self) == self._maxlen))
@@ -20,28 +22,14 @@ if __name__ == "__main__":
 
     model = torch.load("/home/simon/Ambolt/emily/emily-face-mask-detection/models/custom5.pth",
                        map_location=torch.device('cpu'))
-
+    face_detector = FaceDetector()
+    preds = MaxSizeList(12)
 
     cap = cv2.VideoCapture(0)
-    preds = MaxSizeList(12)
-    preds.append(0)
-    preds.append(1)
-
-
-    face_detector = FaceDetector()
-
     while(True):
+
         # Capture frame-by-frame
         ret, frame = cap.read()
-
-        # Our operations on the frame come here
-        # gray = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
-
-        # Detect faces
-        # img = resize(frame)
-        # gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
-        # faces = face_cascade.detectMultiScale(gray, 1.04, 10)
-
         detections = face_detector.detect_face(frame)
 
         if detections is not None:
