@@ -131,7 +131,7 @@ def main():
                         help='input batch size for testing (default: 1000)')
     parser.add_argument('--epochs', type=int, default=20, metavar='N',
                         help='number of epochs to train (default: 14)')
-    parser.add_argument('--lr', type=float, default=0.05, metavar='LR',
+    parser.add_argument('--lr', type=float, default=0.02, metavar='LR',
                         help='learning rate (default: 1.0)')
     parser.add_argument('--gamma', type=float, default=0.7, metavar='M',
                         help='Learning rate step gamma (default: 0.7)')
@@ -189,7 +189,7 @@ def main():
         scheduler.step()
 
         if args.save_model:
-            torch.save(model, f"./models/custom_epoch_{str(epoch + 1)}.pth")
+            torch.save(model, f"./models/2020-10-19_custom_epoch_{str(epoch + 1)}.pth")
 
 
 if __name__ == '__main__':
