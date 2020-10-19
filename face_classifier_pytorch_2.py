@@ -37,54 +37,7 @@ class FaceMaskDataset(torch.utils.data.Dataset):
         return (image, y_label)
 
 
-class Net(nn.Module):
-    def __init__(self):
-        super(Net, self).__init__()
-        self.conv1 = nn.Conv2d(1, 32, 3, 1)
-        self.conv2 = nn.Conv2d(32, 64, 3, 1)
-        self.conv3 = nn.Conv2d(64, 128, 3, 1)
-        self.conv4 = nn.Conv2d(128, 128, 3, 1)
-        self.dropout1 = nn.Dropout(0.25)
-        self.dropout2 = nn.Dropout(0.5)
-        self.fc1 = nn.Linear(4608, 128)
-        # self.fc2 = nn.Linear(9216, 128)
-        self.fc3 = nn.Linear(128, 2)
 
-    def forward(self, x, v=False):
-        x = self.conv1(x)
-        # print("1", x.shape)
-        x = F.relu(x)
-        x = F.max_pool2d(x, 2)
-        x = self.conv2(x)
-        # print("2", x.shape)
-        x = F.relu(x)
-        x = F.max_pool2d(x, 2)
-        # print("3", x.shape)
-        x = self.conv3(x)
-        # print("2", x.shape)
-        x = F.relu(x)
-        x = F.max_pool2d(x, 2)
-        x = self.dropout1(x)
-        x = self.conv4(x)
-        # print("2", x.shape)
-        x = F.relu(x)
-        x = F.max_pool2d(x, 2)
-        # print("4", x.shape)
-        x = torch.flatten(x, 1)
-        # print("5", x.shape)
-        x = self.fc1(x)
-        # print("6", x.shape)
-        x = F.relu(x)
-        x = self.dropout2(x)
-        # print("7", x.shape)
-        # x = self.fc2(x)
-        # x = F.relu(x)
-        x = self.dropout2(x)
-        # print("7", x.shape)
-        x = self.fc3(x)
-        # print("8", x.shape)
-        output = F.log_softmax(x, dim=1)
-        return output
 
 
 def train(args, model, device, train_loader, optimizer, criterion, epoch):

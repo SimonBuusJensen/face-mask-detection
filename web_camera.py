@@ -1,8 +1,8 @@
 import numpy as np
 import cv2
 from FaceDetector import FaceDetector
-from face_classifier_pytorch_2 import Net
-from face_classifier_model import inference
+# from face_classifier_pytorch_2 import Net
+from face_classifier_model import inference, Net
 import torch
 from PIL import Image
 
@@ -18,7 +18,7 @@ class MaxSizeList(list):
 
 if __name__ == "__main__":
 
-    model = torch.load("/home/simon/projects/emily-face-mask-detection/models/custom5.pth",
+    model = torch.load("/home/simon/Ambolt/emily/emily-face-mask-detection/models/custom5.pth",
                        map_location=torch.device('cpu'))
 
 
