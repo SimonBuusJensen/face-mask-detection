@@ -1,6 +1,7 @@
 import numpy as np
 import cv2
-from FaceDetector import face_cascade, detect_face
+from FaceDetector import FaceDetector
+from face_classifier_pytorch_2 import Net
 from face_classifier_model import inference
 import torch
 from PIL import Image
@@ -19,11 +20,15 @@ if __name__ == "__main__":
 
     model = torch.load("/home/simon/projects/emily-face-mask-detection/models/custom5.pth",
                        map_location=torch.device('cpu'))
+
+
     cap = cv2.VideoCapture(0)
     preds = MaxSizeList(12)
     preds.append(0)
     preds.append(1)
 
+
+    face_detector = FaceDetector()
 
     while(True):
         # Capture frame-by-frame
@@ -37,7 +42,7 @@ if __name__ == "__main__":
         # gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
         # faces = face_cascade.detectMultiScale(gray, 1.04, 10)
 
-        detections = detect_face(frame, face_cascade)
+        detections = face_detector.detect_face(frame)
 
         if detections is not None:
             face, eyes = detections

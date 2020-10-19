@@ -36,7 +36,7 @@ class FaceDetector:
         Attention: The detect_face only works for a single person in the image an the persons's eyes has to be visible
         """
         # Resize the input image and convert to gray scale
-        image = self._resize(image, 256)
+        # image = self._resize(image, 256)
         gray = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
 
         # Detect eyes
