@@ -3,7 +3,9 @@ import torch
 import pandas as pd
 
 from torch.utils.data import Dataset
+from skimage import io
 from PIL import Image
+from torchvision import transforms
 
 
 class FaceMaskDataset(Dataset):
@@ -18,7 +20,8 @@ class FaceMaskDataset(Dataset):
 
     def __getitem__(self, index):
         img_path = os.path.join(self.root_dir, self.annotations["file_name"].iloc[index])
-        image = Image.open(img_path)
+        img = io.imread(img_path)
+        image = Image.fromarray(img)
 
         tag = self.annotations["class"].iloc[index]
         tag = int(0 if tag == "No-Mask" else 1)

@@ -55,9 +55,9 @@ def main():
                         help='input batch size for testing (default: 1000)')
     parser.add_argument('--epochs', type=int, default=30, metavar='N',
                         help='number of epochs to train (default: 14)')
-    parser.add_argument('--lr', type=float, default=0.02, metavar='LR',
+    parser.add_argument('--lr', type=float, default=0.01, metavar='LR',
                         help='learning rate (default: 1.0)')
-    parser.add_argument('--gamma', type=float, default=0.7, metavar='M',
+    parser.add_argument('--gamma', type=float, default=0.1, metavar='M',
                         help='Learning rate step gamma (default: 0.7)')
     parser.add_argument('--dry-run', action='store_true', default=False,
                         help='quickly check a single pass')
@@ -87,7 +87,7 @@ def main():
     model = ResNetModel().to(device)
     criterion = torch.nn.CrossEntropyLoss()
     optimizer = torch.optim.SGD(model.parameters(), lr=args.lr, momentum=0.9)
-    scheduler = torch.optim.lr_scheduler.StepLR(optimizer, step_size=1, gamma=args.gamma)
+    scheduler = torch.optim.lr_scheduler.StepLR(optimizer, step_size=5, gamma=args.gamma)
 
     best_acc = 0
     for epoch in range(1, args.epochs + 1):
@@ -96,8 +96,8 @@ def main():
         scheduler.step()
 
         if acc > best_acc:
-            acc = best_acc
-            model.save_model(f"./models/2021-01-28/resnet_34_epoch_{str(epoch + 1)}_acc_{acc}.pth")
+            best_acc = acc
+            model.save_model(f"./models/2021-01-28/resnet_34_epoch_{str(epoch + 1)}_acc_{round(acc, 2)}.pth")
 
 
 if __name__ == '__main__':
