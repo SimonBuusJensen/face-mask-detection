@@ -1,12 +1,15 @@
-import numpy as np
 import cv2
-from FaceDetector import FaceDetector
-# from face_classifier_pytorch_2 import Net
-from face_classifier_model import inference, Net
-import torch
+
+import numpy as np
 from PIL import Image
 
+from FaceDetector import FaceDetector
+from model import ResNetModel, CustomModel
+from predict import inference
+from transforms import Transformer
+
 font = cv2.FONT_HERSHEY_SIMPLEX
+
 
 class MaxSizeList(list):
 
@@ -18,15 +21,17 @@ class MaxSizeList(list):
         self.__delitem__(slice(0, len(self) == self._maxlen))
         super(MaxSizeList, self).append(element)
 
+
 if __name__ == "__main__":
 
-    model = torch.load("/home/simon/Ambolt/emily/emily-face-mask-detection/models/custom5.pth",
-                       map_location=torch.device('cpu'))
     face_detector = FaceDetector()
-    preds = MaxSizeList(12)
+    face_classifier_model = CustomModel()
+    face_classifier_model.load_model('models/2021-01-28/custom_model_epoch_8_acc_95.3.pth', 'cpu')
+    transformer = Transformer()
 
+    preds = MaxSizeList(12)
     cap = cv2.VideoCapture(0)
-    while(True):
+    while (True):
 
         # Capture frame-by-frame
         ret, frame = cap.read()
@@ -37,27 +42,25 @@ if __name__ == "__main__":
             (x, y, x2, y2) = face
             face_img = frame[y:y2, x:x2].copy()
             cv2.imshow('face', face_img)
-            pred = inference(Image.fromarray(face_img), model)
-            preds.append(pred)
+            pred_class, pred_conf = inference(face_classifier_model, Image.fromarray(face_img), transformer.test_transforms())
+            preds.append(pred_conf)
             cv2.rectangle(frame, (x, y), (x2, y2), (255, 0, 0), 2)
 
             for eye in eyes:
                 (x, y, w, h) = eye
                 cv2.rectangle(frame, (x, y), (x + w, y + h), (255, 0, 0), 2)
 
+        print(np.mean(preds))
         if np.mean(preds) <= 0.5:
             text = "Mask"
             text_color = (0, 255, 0)
         else:
             text = "No Mask"
             text_color = (0, 0, 255)
-        cv2.putText(frame, text, (20, 50), font, 1, text_color, 2, cv2.LINE_AA)
-            # cv2.imshow("face", face_img)
 
-            # Draw rectangle around the faces
+        cv2.putText(frame, text, (20, 50), font, 1, text_color, 2, cv2.LINE_AA)
 
         # Display the resulting frame
-        print(preds)
         cv2.imshow('frame', frame)
 
         if cv2.waitKey(1) & 0xFF == ord('q'):

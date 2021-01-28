@@ -49,11 +49,11 @@ def test(model, device, criterion, test_loader):
 def main():
     # Training settings
     parser = argparse.ArgumentParser(description='PyTorch Mask Classifier Example')
-    parser.add_argument('--train-batch-size', type=int, default=16, metavar='N',
+    parser.add_argument('--train-batch-size', type=int, default=32, metavar='N',
                         help='input batch size for training (default: 64)')
-    parser.add_argument('--test-batch-size', type=int, default=16, metavar='N',
+    parser.add_argument('--test-batch-size', type=int, default=4, metavar='N',
                         help='input batch size for testing (default: 1000)')
-    parser.add_argument('--epochs', type=int, default=20, metavar='N',
+    parser.add_argument('--epochs', type=int, default=30, metavar='N',
                         help='number of epochs to train (default: 14)')
     parser.add_argument('--lr', type=float, default=0.02, metavar='LR',
                         help='learning rate (default: 1.0)')
@@ -97,7 +97,7 @@ def main():
 
         if acc > best_acc:
             acc = best_acc
-            model.save_model(f"./models/2020-10-19_custom_gray_epoch_{str(epoch + 1)}_acc_{acc}.pth")
+            model.save_model(f"./models/2021-01-28/resnet_34_epoch_{str(epoch + 1)}_acc_{acc}.pth")
 
 
 if __name__ == '__main__':
