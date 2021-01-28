@@ -2,7 +2,7 @@ import numpy as np
 import cv2
 from FaceDetector import FaceDetector
 # from face_classifier_pytorch_2 import Net
-from model import inference, CustomModel
+from face_classifier_model import inference, Net
 import torch
 from PIL import Image
 
