@@ -63,18 +63,18 @@ class ResNetModel(nn.Module):
 
     def __init__(self):
         super().__init__()  # Inherit methods from the super class which this class extends from
-        self.resnet = models.resnet34(pretrained=True, progress=True)
+        self.resnet = models.resnet18(pretrained=True, progress=True)
 
         # Disable gradients for all convolutional layers in resnet
         for param in self.resnet.parameters():
             param.requires_grad = False
 
-        self.resnet.fc = torch.nn.Linear(self.resnet.fc.in_features, 512)
+        self.resnet.fc = torch.nn.Linear(self.resnet.fc.in_features, 256)
         self.act = torch.nn.ReLU()
-        self.fc = torch.nn.Linear(512, 256)
+        self.fc = torch.nn.Linear(256, 128)
         self.act1 = torch.nn.ReLU()
         # Final layer will output 2 values
-        self.fc1 = torch.nn.Linear(256, 2)
+        self.fc1 = torch.nn.Linear(128, 2)
 
     def forward(self, sample):
         """

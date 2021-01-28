@@ -25,8 +25,8 @@ class MaxSizeList(list):
 if __name__ == "__main__":
 
     face_detector = FaceDetector()
-    face_classifier_model = CustomModel()
-    face_classifier_model.load_model('models/2021-01-28/custom_model_epoch_8_acc_95.3.pth', 'cpu')
+    face_classifier_model = ResNetModel()
+    face_classifier_model.load_model('models/2021-01-28/resnet_model_epoch_5_acc_97.37.pth', 'cpu')
     transformer = Transformer()
 
     preds = MaxSizeList(12)
@@ -51,11 +51,11 @@ if __name__ == "__main__":
                 cv2.rectangle(frame, (x, y), (x + w, y + h), (255, 0, 0), 2)
 
         print(np.mean(preds))
-        if np.mean(preds) <= 0.5:
-            text = "Mask"
+        if np.mean(preds) >= 0.90:
+            text = "No Mask"
             text_color = (0, 255, 0)
         else:
-            text = "No Mask"
+            text = "Mask"
             text_color = (0, 0, 255)
 
         cv2.putText(frame, text, (20, 50), font, 1, text_color, 2, cv2.LINE_AA)
