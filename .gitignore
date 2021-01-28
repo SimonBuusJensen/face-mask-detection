@@ -1,0 +1,10 @@
+
+
+.idea/*
+
+# Don't commit trained models
+models/*
+
+
+*__pycache__*
+utils/__pycache__/*

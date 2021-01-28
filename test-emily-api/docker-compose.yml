@@ -1,9 +1,0 @@
-
-version: "3"
-services:
-  test-emily-api:
-    build:
-      context: .
-      dockerfile: /home/ambolt/Projects/test-emily-api/.devcontainer/Dockerfile
-    volumes:
-    - /home/ambolt/Data:/workspace/data/

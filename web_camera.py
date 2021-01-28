@@ -1,15 +1,18 @@
 import numpy as np
 import cv2
-from FaceDetector import face_cascade, detect_face
-from face_classifier_model import inference
+from FaceDetector import FaceDetector
+# from face_classifier_pytorch_2 import Net
+from model import inference, CustomModel
 import torch
 from PIL import Image
 
 font = cv2.FONT_HERSHEY_SIMPLEX
 
 class MaxSizeList(list):
+
     def __init__(self, maxlen):
         self._maxlen = maxlen
+        self.append(0)
 
     def append(self, element):
         self.__delitem__(slice(0, len(self) == self._maxlen))
@@ -17,27 +20,17 @@ class MaxSizeList(list):
 
 if __name__ == "__main__":
 
-    model = torch.load("/home/simon/projects/emily-face-mask-detection/models/custom5.pth",
+    model = torch.load("/home/simon/Ambolt/emily/emily-face-mask-detection/models/custom5.pth",
                        map_location=torch.device('cpu'))
-    cap = cv2.VideoCapture(0)
+    face_detector = FaceDetector()
     preds = MaxSizeList(12)
-    preds.append(0)
-    preds.append(1)
 
-
+    cap = cv2.VideoCapture(0)
     while(True):
+
         # Capture frame-by-frame
         ret, frame = cap.read()
-
-        # Our operations on the frame come here
-        # gray = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
-
-        # Detect faces
-        # img = resize(frame)
-        # gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
-        # faces = face_cascade.detectMultiScale(gray, 1.04, 10)
-
-        detections = detect_face(frame, face_cascade)
+        detections = face_detector.detect_face(frame)
 
         if detections is not None:
             face, eyes = detections
